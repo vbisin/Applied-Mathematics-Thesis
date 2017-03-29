@@ -6,7 +6,7 @@ Created on Tue Mar  7 15:00:25 2017
 @author: vittoriobisin
 """
 import numpy as np
-from rbfNew import rbfF
+from rbf import rbfF
 from numpy import dot as dot
 from numpy import transpose as trans
 from makedOmegadW import makedOmegadW

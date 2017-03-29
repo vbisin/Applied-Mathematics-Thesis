@@ -8,7 +8,7 @@ Created on Tue Mar 21 10:25:41 2017
 
 def functionEval(W,sampleY,alpha):
     import numpy as np
-    from rbfNew import rbfF
+    from rbf import rbfF
     alphaDim=len(alpha)
     estimate=np.dot(rbfF(np.dot(W,sampleY),alphaDim),alpha) 
     estimate=np.dot(np.transpose(W),estimate)

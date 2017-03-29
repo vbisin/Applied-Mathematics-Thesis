@@ -9,11 +9,10 @@ Created on Sun Feb 26 20:22:56 2017
 # Let's define the original signal
 import numpy as np
 from createStep import createSteps
-from SGD import multiSGD
 import matplotlib.pyplot as plt
-from rbfNew import rbfF
+from rbf import rbfF
 import time
-from SGDthres import multiSGDthres
+from SGD import multiSGDthres
 from functionEval import functionEval
 start_time = time.time()
 
