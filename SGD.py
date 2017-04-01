@@ -1,36 +1,29 @@
 
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Mar  3 10:43:31 2017
+## Stochastic Gradient Descent Loop for Algorithm 
 
-@author: vittoriobisin
-"""
+
+import numpy as np
+from gradients import alphaGradient, wGradient
+from estimateSignal import estimateSignal
+
+
 
 def multiSGDthres(x,y,alphaDim): 
-    import numpy as np
-    #from rbfNew import rbfF
-    #from numpy import dot as dot
-    from gradients import alphaGradient, wGradient
-    from functionEval import functionEval
-    #from backtrackArmijo import backtrackArmijoAlpha, backtrackArmijoW
-    #initialize W matrix 
+##Recover variable dimensions
     N=x.shape[0]
     samples=x.shape[1]
-    factsToReturn=list()
-
-
-
-    #W = np.ones((N,N))*.001
-    #W = np.ones((N,N))*.001
-    #W=np.random.uniform(low=-1, high=1, size=(N,N))
-#    W=np.zeros((N,N))
-#    np.fill_diagonal(W,2)
-#    for i in range(N-1):
-#        W[i+1,i]=-1
-#        W[i,i+1]=-1
+    maxSamples=np.arange(samples)
     
-   # W=np.ones((N,N))*.000001
+## Initializations 
+
+    #Learning Rates
+    learningRateAlpha=.0001
+    learningRateW=.00000001     
+    
+    
+    ##W and alpha Initalization 
+    
+    #W=np.ones((N,N))*.00001
     W=np.zeros((N,N))
     for i in range(N):
         if i==0:
@@ -38,89 +31,103 @@ def multiSGDthres(x,y,alphaDim):
         else:
             np.fill_diagonal(W,1)
             W[i,i-1]=-1
-       
-            
+
+    #alpha=np.ones(alphaDim)*.75
+    #Approximate optimized values of alpha when SGD on it
+    alpha=np.array([3.86,8.08,12.05,9.9,3.47,.48,-2.54,-8.667,-10.63,-6.75,-2.4], dtype=np.float)              
+                  
+    # Function error difference between consecutive epochs (initialization is arbitrary)
+    functionError=1
     
-    alpha=np.ones(alphaDim)*.75
+    # Divergence criterion 
+    divergenceThreshold=100
     
-    #alpha=np.random.uniform(low=-.5, high=.5, size=(alphaDim,))
+    
+    # Error criterion needed to exit Stochastic Gradient descent 
+    errorThreshold=1
+    
 
-#    for i in range(400):
-#        if i%2==0:
-#            alpha[i]=1
-#        else:
-#            alpha[i]=-1
-
-
+## Graph Variables to return 
+    
+    #Average error over samples per epoch 
     errorEpoch=list()
-    #Initialize error rates
     errorEpoch.append(np.mean(np.mean((x-y)**2,axis=0)))
-    savedAlphaGrads=list()
-
-    #stepSizeAlpha=list()
-    #stepSizeW=list()
-
-    maxSamples=np.arange(samples)
-    #learningRateAlpha=.001
-    learningRateAlpha=.0001
-    #preLearningRateAlpha=1
-
-    #learningRateW=.0001
-    learningRateW=.000001           
-    #preLearningRateW=1
     
-    
-    ## Different learning rates for alpha and w???
+    #Historical values of alpha and W
     alphaHistory=list()
     WHistory=list()
     alphaHistory.append(alpha)
     WHistory.append(W)
+
+    #Historical values of the gradients of alpha and W
+    savedAlphaGrads=list()
+    savedWGrads=list()
     
-    #errorSample.append(np.sum(y[:,j]-[function evaluated with params and current x])
-    factsToReturn.append(W[0,0])
-    factsToReturn.append(alpha[0])
-    factsToReturn.append(learningRateAlpha)
-    factsToReturn.append(learningRateW)
-
-
-    while len(errorEpoch)<2 or abs(errorEpoch[len(errorEpoch)-1]-errorEpoch[len(errorEpoch)-2])>1:
+    #Learning Rates
+    learningRates=list()
+    learningRates.append(learningRateAlpha)
+    learningRates.append(learningRateW)
+      
+        
+## Stochastic Gradient Descent loop, completes at least two epochs 
+    # and exits if error between epochs is less than the threshold
+    
+    while len(errorEpoch)<2 or functionError>errorThreshold:
+        
+        # Function error for each sample 
         errorSample=list()
-        for j in maxSamples:
-        #for j in range(10):
+        
+    ## Iterate over samples
+        for i in maxSamples:
 
-            sampleX=x[:,j]
-            sampleY=y[:,j]
-            #RHS of original equation 
+            # Current samples
+            sampleX=x[:,i]
+            sampleY=y[:,i]
             
+            
+        ##Calculate gradients for alpha and W
             alphaGrad=alphaGradient(sampleX,sampleY,alpha,W)
+            WGrad=wGradient(sampleX,sampleY,alpha,W)
+          
+            #Record current alpha and W gradients
             savedAlphaGrads.append(alphaGrad)
-            #WGrad=wGradient(sampleX,sampleY,alpha,W)
+            savedWGrads.append(WGrad)
             
-            #learningRateAlpha=backtrackArmijoAlpha(W,sampleY,alpha,alphaGrad)
-            #learningRateW=backtrackArmijoW(W,sampleY,alpha,W)
-            
-            #preLearningRateAlpha=learningRateAlpha
-            #preLearningRateW=learningRateW
-            #stepSizeAlpha.append(preLearningRateAlpha)
-            #stepSizeW.append(preLearningRateW)
 
-            
+        ## Update alpha and W                 
             alpha=alpha-learningRateAlpha*alphaGrad
-            #W=W-learningRateW*WGrad
+            W=W-learningRateW*WGrad
             
-            estimate=functionEval(W,sampleY,alpha)
-            errorSample.append(np.mean((sampleX-(sampleY+estimate))**2))
+            # Calculate current objective function estimate 
+            estimate=estimateSignal(W,sampleY,alpha)
             
+            # Record MSE for each sample
+            errorSample.append(np.mean((sampleX-(estimate))**2))
+            
+            # Record current alpha and W values
             alphaHistory.append(alpha)
             WHistory.append(W)
             
+   
+        # For each epoch record average error of each sample
         errorEpoch.append(np.average(errorSample))
+        
+        # Update function error between consecutive epochs 
+        functionError=abs(errorEpoch[len(errorEpoch)-1]-errorEpoch[len(errorEpoch)-2])
+        
         print("Threshold SGD " + str(len(errorEpoch)-1))
-        if len(errorEpoch)>2 and errorEpoch[len(errorEpoch)-1]-errorEpoch[len(errorEpoch)-2]>1000:
+        
+        
+   ## Divergence criterion     
+       # If algorithm has completed more than 2 epochs and is greater than the divergence 
+       # threshold then exit 
+        if len(errorEpoch)>2 and functionError>divergenceThreshold:
             print("diverged")
             break
                 
-    return (alpha, W, errorEpoch,errorSample,alphaHistory,WHistory,factsToReturn,savedAlphaGrads)            
+        
+        
+    return (alpha, W, errorEpoch,errorSample,alphaHistory,WHistory,learningRates,savedAlphaGrads,savedWGrads)            
             
                         
                         
