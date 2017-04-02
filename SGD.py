@@ -8,34 +8,17 @@ from estimateSignal import estimateSignal
 
 
 
-def multiSGDthres(x,y,alphaDim): 
+def multiSGDthres(x,y,alpha,W): 
 ##Recover variable dimensions
-    N=x.shape[0]
     samples=x.shape[1]
     maxSamples=np.arange(samples)
-    
 ## Initializations 
 
     #Learning Rates
     learningRateAlpha=.0001
-    learningRateW=.00000001     
+    learningRateW=.0000001     
     
-    
-    ##W and alpha Initalization 
-    
-    #W=np.ones((N,N))*.00001
-    W=np.zeros((N,N))
-    for i in range(N):
-        if i==0:
-            W[i,i]=1
-        else:
-            np.fill_diagonal(W,1)
-            W[i,i-1]=-1
 
-    #alpha=np.ones(alphaDim)*.75
-    #Approximate optimized values of alpha when SGD on it
-    alpha=np.array([3.86,8.08,12.05,9.9,3.47,.48,-2.54,-8.667,-10.63,-6.75,-2.4], dtype=np.float)              
-                  
     # Function error difference between consecutive epochs (initialization is arbitrary)
     functionError=1
     

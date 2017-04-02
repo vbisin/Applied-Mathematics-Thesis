@@ -30,13 +30,28 @@ alphaDim=11
 #Standard deviation of added noise 
 noiseStdDev=25
 
-#Retrive randomly generated piecewise constant Signals 
+#Retrive randomly generated piecewise constant signals (x is original, y is noisy)
 (x,y)=createSteps(numberExamples,signalLength,maxValue,noiseStdDev)
 
+##W and alpha Initalization 
+    
+W=np.ones((signalLength,signalLength))*.00001
+#W=np.zeros((N,N))
+for i in range(signalLength):
+    if i==0:
+        W[i,i]=1
+    else:
+        np.fill_diagonal(W,1)
+        W[i,i-1]=-1
+
+alpha=np.ones(alphaDim)*.75
+#Approximate optimized values of alpha when SGD on it
+#alpha=np.array([3.86,8.08,12.05,9.9,3.47,.48,-2.54,-8.667,-10.63,-6.75,-2.4], dtype=np.float)              
+                  
+
+
 #Run the Stochastic Gradient Descent Algorithm
-(alpha, W, errorEpoch,errorSample,alphaHistory,WHistory,learningRates,savedAlphaGrads,savedWGrads)=multiSGDthres(x,y,alphaDim)
-
-
+(alpha, W, errorEpoch,errorSample,alphaHistory,WHistory,learningRates,savedAlphaGrads,savedWGrads)=multiSGDthres(x,y,alpha,W)
 
 
 
@@ -111,9 +126,11 @@ plt.show()
 #Calculate sum of function evaluation estimates w.r.t. epochs
 estimateSum=np.zeros(EPOCH)
 WSum=np.zeros(EPOCH)
+alphaSum=np.zeros(EPOCH)
 for i in range(EPOCH):
     estimateSum[i]=sum(np.abs(y[:,signal]+np.dot(np.transpose(WHistory[i]),np.dot(rbfF(np.dot(WHistory[i],y[:,signal]),alphaDim),alphaHistory[i])))) 
     WSum[i]=sum(sum(np.abs(WHistory[i])))
+    alphaSum[i]=sum(sum(np.abs(alphaHistory[i])))
 
 # Absolute Sums of predicted and actual signals 
 plt.figure(5)
@@ -137,10 +154,20 @@ plt.savefig('Wsum')
 plt.show
 
 
+# Absolute sums of alpha w.r.t. epochs
+plt.figure(7)
+plt.plot(iteratorEpochs,alphaSum,'b',label='Sum of alpha')
+plt.title("Sum of alpha")
+plt.legend(bbox_to_anchor=(.24, .89), loc=0, borderaxespad=0.)
+plt.ylabel('Sum')
+plt.xlabel('Iteration')
+plt.savefig('alphaSum')
+plt.show
+
 
 
 # Original, noisy, and predicted signals 
-plt.figure(7)
+plt.figure(8)
 plt.title("Original, Noisy and Predicted Values for Signal: " +str(signal+1))
 plt.plot(iteratorN,x[:,signal],'r',label='Original Signal')
 plt.plot(iteratorN,y[:,signal],'b',label='Noisy Signal (sigma=25)')
