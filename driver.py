@@ -115,7 +115,7 @@ plt.savefig('alphas')
 plt.show
 
 
-# Heat map of learned kernel
+# Heat map of learned kernel (W)
 plt.figure(4)
 plt.imshow(W, cmap='hot', interpolation='nearest')
 plt.title("Heat Map of Kernel Matrix")
