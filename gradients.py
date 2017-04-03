@@ -5,7 +5,7 @@ import numpy as np
 from rbf import rbfF
 from numpy import dot as dot
 from numpy import transpose as trans
-from makedOmegadW import makedOmegadW
+from dOmegadW import dOmegadW
 from estimateSignal import estimateSignal
 
 
@@ -76,8 +76,8 @@ def wGradient(sampleX,sampleY,alpha,W):
     
     
 ## Calculate RHS of product rule for dGammadW (i.e. -transpose(W)*dOmegadW)
-    dOmegadW=makedOmegadW(sampleY,alpha,W)
-    RHSProductRule=dot(negTransW,dOmegadW)
+    derivOmegadW=dOmegadW(sampleY,alpha,W)
+    RHSProductRule=dot(negTransW,derivOmegadW)
 
 
 ## Calculate dFdW (i.e. dFdG*dGammadW)

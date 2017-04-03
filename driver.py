@@ -130,11 +130,11 @@ alphaSum=np.zeros(EPOCH)
 for i in range(EPOCH):
     estimateSum[i]=sum(np.abs(y[:,signal]+np.dot(np.transpose(WHistory[i]),np.dot(rbfF(np.dot(WHistory[i],y[:,signal]),alphaDim),alphaHistory[i])))) 
     WSum[i]=sum(sum(np.abs(WHistory[i])))
-    alphaSum[i]=sum(sum(np.abs(alphaHistory[i])))
+    alphaSum[i]=sum(np.abs(alphaHistory[i]))
 
 # Absolute Sums of predicted and actual signals 
 plt.figure(5)
-plt.plot(iteratorEpochs,estimateSum,'b',label='Estimated Sum: Signal '+str(signal+1))
+plt.plot(iteratorEpochs,estimateSum,'b',label='Estimated Sum of Absolute Value of Signal '+str(signal+1))
 plt.plot(iteratorEpochs,np.ones(EPOCH)*sum(np.abs(x[:,signal])),'r',label='Actual Sum: Signal '+str(signal+1))
 plt.title("Sum of Estimates")
 plt.legend(bbox_to_anchor=(.24, .89), loc=0, borderaxespad=0.)
@@ -145,7 +145,7 @@ plt.show
 
 # Absolute sums of W matrix w.r.t. epochs
 plt.figure(6)
-plt.plot(iteratorEpochs,WSum,'b',label='Sum of W')
+plt.plot(iteratorEpochs,WSum,'b',label='Sum of Absolute Value of W')
 plt.title("Sum of W")
 plt.legend(bbox_to_anchor=(.24, .89), loc=0, borderaxespad=0.)
 plt.ylabel('Sum')
@@ -156,7 +156,7 @@ plt.show
 
 # Absolute sums of alpha w.r.t. epochs
 plt.figure(7)
-plt.plot(iteratorEpochs,alphaSum,'b',label='Sum of alpha')
+plt.plot(iteratorEpochs,alphaSum,'b',label='Sum of Absolute Value of alpha')
 plt.title("Sum of alpha")
 plt.legend(bbox_to_anchor=(.24, .89), loc=0, borderaxespad=0.)
 plt.ylabel('Sum')

@@ -23,7 +23,7 @@ def multiSGDthres(x,y,alpha,W):
     functionError=1
     
     # Divergence criterion 
-    divergenceThreshold=100
+    divergenceThreshold=10
     
     
     # Error criterion needed to exit Stochastic Gradient descent 
@@ -55,7 +55,7 @@ def multiSGDthres(x,y,alpha,W):
 ## Stochastic Gradient Descent loop, completes at least two epochs 
     # and exits if error between epochs is less than the threshold
     
-    while len(errorEpoch)<2 or functionError>errorThreshold:
+    while len(errorEpoch)<3 or functionError>errorThreshold:
         
         # Function error for each sample 
         errorSample=list()
