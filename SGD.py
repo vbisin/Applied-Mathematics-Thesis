@@ -16,7 +16,7 @@ def multiSGDthres(x,y,alpha,W):
 
     #Learning Rates
     learningRateAlpha=.0001
-    learningRateW=.0000001     
+    learningRateW=.00000001     
     
 
     # Function error difference between consecutive epochs (initialization is arbitrary)

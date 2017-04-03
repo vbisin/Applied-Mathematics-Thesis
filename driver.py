@@ -168,7 +168,7 @@ plt.show
 
 # Original, noisy, and predicted signals 
 plt.figure(8)
-plt.title("Original, Noisy and Predicted Values for Signal: " +str(signal+1))
+plt.title("Original, Noisy, and Predicted Values for Signal: " +str(signal+1))
 plt.plot(iteratorN,x[:,signal],'r',label='Original Signal')
 plt.plot(iteratorN,y[:,signal],'b',label='Noisy Signal (sigma=25)')
 plt.plot(iteratorN,y[:,signal]+finalEstimates[:,signal],'y',label='Predicted Signal')
