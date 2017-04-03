@@ -6,7 +6,7 @@ Python code for a 1-D implementation of the denoising algorithm from "On learnin
 The driver script for the algorithm. Outputs graphs and percent successfully denoised. 
 
 ##  createStep.py 
-Creates step (i.e. piece-wise constant) signals, where each function has one of {1,2,4,5,10,20,25,50} jumps (i.e. multiples of 100, not including 100). At each one of these steps the function takes a random float between 1 and 100. I then add random Gaussian noise (with mean 0 and standard deviation 25) to each signal. 
+Creates step (i.e. piece-wise constant) signals, where each function has a number of jumps equal to a multiple of the original signal's length. At each one of these steps the function takes a random number between 1 and 100. A large amount of Gaussian noise (mean 0 and standard deviation 25) is then added to each signal. 
 
 ## sgd.py
 Runs a stochastic gradient descent to minimize the the kernel (W) and radial basis function parameter (alpha). 
