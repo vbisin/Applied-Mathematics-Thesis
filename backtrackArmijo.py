@@ -23,21 +23,3 @@ def backtrackArmijoAlpha (W,sampleY,alpha,alphaGrad):
         print("Alpha "+str(counter))
     return stepSize
 
-
-#def backtrackArmijoTrial (x,sampleY,alpha,alphaGrad):
-#    stepSize=10
-#    tao=.5   
-#    counter=0
-#    
-#    xk1=x
-#    xk2=(xk1-stepSize*2*xk1)**2
-#    RHS=xk1**2-.5*stepSize*(2*xk1)**2
-#    #while  (xk2<=RHS).all():
-#    while (xk2>RHS):
-#        stepSize=stepSize*tao
-#        xk2=(x-stepSize*2*x)**2
-#        RHS=xk1-.5*stepSize*(2*x**2)
-#
-#        counter+=1
-#        print("Alpha "+str(counter))
-#    return stepSize
