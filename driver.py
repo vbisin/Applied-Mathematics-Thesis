@@ -36,7 +36,7 @@ noiseStdDev=25
 ##W and alpha Initalization 
     
 W=np.ones((signalLength,signalLength))*.00001
-#W=np.zeros((N,N))
+#W=np.zeros((signalLength,signalLength))
 for i in range(signalLength):
     if i==0:
         W[i,i]=1
@@ -45,7 +45,7 @@ for i in range(signalLength):
         W[i,i-1]=-1
 
 alpha=np.ones(alphaDim)*.75
-#Approximate optimized values of alpha when SGD on it
+#Approximate optimized values of alpha after SGD (used when only optimizing W)
 #alpha=np.array([3.86,8.08,12.05,9.9,3.47,.48,-2.54,-8.667,-10.63,-6.75,-2.4], dtype=np.float)              
                   
 
@@ -65,7 +65,7 @@ EPOCH=(len(epochsArray)-1)*numberExamples+1
 iteratorEpochs=np.arange(EPOCH)
       
 #Exemplary signal to graph 
-signal=200
+signal=0
     
 #Calculate final estimated signal for each signal (i.e. after the algorithm has converged)
 finalEstimates=np.zeros((signalLength,numberExamples))
@@ -78,8 +78,6 @@ if sum(sum(np.abs(x-y)))>sum(sum(np.abs(x-y-finalEstimates))):
     print("Percent denoised: "+str((1-sum(sum(np.abs(x-y-finalEstimates)))/sum(sum(np.abs(x-y))))*100))
 else: 
     print("denoising did not occur")
-
-
 
 
 
@@ -146,7 +144,7 @@ plt.show
 # Absolute sums of W matrix w.r.t. epochs
 plt.figure(6)
 plt.plot(iteratorEpochs,WSum,'b',label='Sum of Absolute Value of W')
-plt.title("Sum of W")
+plt.title("Sum of Absolute values of W")
 plt.legend(bbox_to_anchor=(.24, .89), loc=0, borderaxespad=0.)
 plt.ylabel('Sum')
 plt.xlabel('Iteration')
@@ -160,6 +158,7 @@ plt.plot(iteratorEpochs,alphaSum,'b',label='Sum of Absolute Value of alpha')
 plt.title("Sum of alpha")
 plt.legend(bbox_to_anchor=(.24, .89), loc=0, borderaxespad=0.)
 plt.ylabel('Sum')
+
 plt.xlabel('Iteration')
 plt.savefig('alphaSum')
 plt.show
@@ -169,14 +168,13 @@ plt.show
 # Original, noisy, and predicted signals 
 plt.figure(8)
 plt.title("Original, Noisy, and Predicted Values for Signal: " +str(signal+1))
-plt.plot(iteratorN,x[:,signal],'r',label='Original Signal')
-plt.plot(iteratorN,y[:,signal],'b',label='Noisy Signal (sigma=25)')
-plt.plot(iteratorN,y[:,signal]+finalEstimates[:,signal],'y',label='Predicted Signal')
+plt.plot(iteratorN,x[:,signal],'b',label='Original Signal')
+plt.plot(iteratorN,y[:,signal],'r',label='Noisy Signal (sigma=25)')
+plt.plot(iteratorN,y[:,signal]+finalEstimates[:,signal],'k',label='Predicted Signal')
 plt.legend(bbox_to_anchor=(.52, .24), loc=0, borderaxespad=0.)
 plt.xlabel('Iteration')
 plt.savefig('estimates')
 plt.show
-
 
 os.system('say "free will is an illusion"')
 print "My program took", time.time() - start_time, "to run"

@@ -15,8 +15,8 @@ def multiSGDthres(x,y,alpha,W):
 ## Initializations 
 
     #Learning Rates
-    learningRateAlpha=.0001
-    learningRateW=.00000001     
+    learningRateAlpha=.0000005
+    learningRateW=.00000005     
     
 
     # Function error difference between consecutive epochs (initialization is arbitrary)
@@ -55,7 +55,7 @@ def multiSGDthres(x,y,alpha,W):
 ## Stochastic Gradient Descent loop, completes at least two epochs 
     # and exits if error between epochs is less than the threshold
     
-    while len(errorEpoch)<3 or functionError>errorThreshold:
+    while len(errorEpoch)<3 or abs(functionError)>errorThreshold:
         
         # Function error for each sample 
         errorSample=list()
@@ -96,7 +96,7 @@ def multiSGDthres(x,y,alpha,W):
         errorEpoch.append(np.average(errorSample))
         
         # Update function error between consecutive epochs 
-        functionError=abs(errorEpoch[len(errorEpoch)-1]-errorEpoch[len(errorEpoch)-2])
+        functionError=errorEpoch[len(errorEpoch)-1]-errorEpoch[len(errorEpoch)-2]
         
         print("Threshold SGD " + str(len(errorEpoch)-1))
         

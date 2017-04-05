@@ -77,6 +77,9 @@ def wGradient(sampleX,sampleY,alpha,W):
     
 ## Calculate RHS of product rule for dGammadW (i.e. -transpose(W)*dOmegadW)
     derivOmegadW=dOmegadW(sampleY,alpha,W)
+#    from sys import getsizeof
+#    getsizeof(derivOmegadW)
+#    print(getsizeof(derivOmegadW))
     RHSProductRule=dot(negTransW,derivOmegadW)
 
 
