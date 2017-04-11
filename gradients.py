@@ -3,8 +3,6 @@
 
 import numpy as np
 from rbf import rbfF
-from numpy import dot as dot
-from numpy import transpose as trans
 from dOmegadW import dOmegadW
 from estimateSignal import estimateSignal
 
@@ -16,11 +14,6 @@ def dFdGamma(sampleX,sampleY,alpha,W):
     dFdG=sampleX-(estimateSignal(W,sampleY,alpha))
     
     return dFdG
-
-
-
-
-
 
 
 ## Compute the gradient w.r.t. alpha
@@ -36,17 +29,17 @@ def alphaGradient(sampleX,sampleY,alpha,W):
     
     # Define variables needed for calculating derivative
     dGdA=np.zeros((N,alphaDim))
-    rbfWY=rbfF(dot(W,sampleY),alphaDim)
-    negWTrans=-trans(W)
+    rbfWY=rbfF(W,sampleY,alphaDim)
+    negWTrans=-np.transpose(W)
     
 ## Calculate dGammaddAlpha 
-    for i in iteratorN:
-        dGdA[i,:]=np.asarray([dot(negWTrans[i,:],(rbfWY[:,j])) for j in iteratorAlpha]).astype(np.float) 
+    dGdA=np.asarray([np.asarray([np.dot(negWTrans[i,:],(rbfWY[:,j])) for j in iteratorAlpha]).astype(np.float) for i in iteratorN])
     
     
 ## Calculate dot product from chain rule (dFdGamma=dFdGamma*dGammadAlpha) 
     dFdG=dFdGamma(sampleX,sampleY,alpha,W)
-    dFdA=dot(dFdG,dGdA) 
+    
+    dFdA=np.dot(dFdG,dGdA) 
     
     return dFdA
 
@@ -56,36 +49,34 @@ def alphaGradient(sampleX,sampleY,alpha,W):
 
 
 ## Compute the derivative w.r.t. W
-def wGradient(sampleX,sampleY,alpha,W):
+def WGradient(sampleX,sampleY,alpha,W):
     
     # Recover respective lengths
     N=len(sampleX)
     alphaDim=len(alpha)
-    negTransW=-trans(W)
+    negTransW=-np.transpose(W)
     
     
     # Define omega as the Gaussian RBF Function
-    rbfWY=rbfF(dot(W,sampleY),alphaDim)
-    omega=dot(rbfWY,alpha)
-    
-## Calculate LHS of product rule for dGammadW (i.e. d(-transpose(W))dW*omega) 
-    #since d(-transpose(W))dW is the identity 4-tensor, then the above product will be a 3 tensor
-    LHSProductRule=np.zeros((N,N,N))
-    iterator=np.arange(N)
-    LHSProductRule[iterator,iterator,iterator]=-omega[iterator]
-    
-    
-## Calculate RHS of product rule for dGammadW (i.e. -transpose(W)*dOmegadW)
+    rbfWY=rbfF(W,sampleY,alphaDim)
+    omega=np.dot(rbfWY,alpha)
+
+## Calculate LHS of product rule for dGammadW (i.e. -transpose(W)*dOmegadW)
     derivOmegadW=dOmegadW(sampleY,alpha,W)
-#    from sys import getsizeof
-#    getsizeof(derivOmegadW)
-#    print(getsizeof(derivOmegadW))
-    RHSProductRule=dot(negTransW,derivOmegadW)
+    LHSProductRule=np.dot(negTransW,derivOmegadW)
+
+    
+## Calculate RHS of product rule for dGammadW (i.e. d(-transpose(W))dW*omega) 
+    #since d(-transpose(W))dW is the identity 4-tensor, then the above product will be a 3 tensor
+    RHSProductRule=np.zeros((N,N,N))
+    iterator=np.arange(N)
+    #LHSProductRule[iterator,iterator,iterator]=-omega[iterator]
+    RHSProductRule[iterator,iterator,iterator]=-omega[iterator]
 
 
 ## Calculate dFdW (i.e. dFdG*dGammadW)
     dFdG=dFdGamma(sampleX,sampleY,alpha,W)
 
-    dFdW=dot(dFdG,trans(LHSProductRule+RHSProductRule))
-    
+    dFdW=np.dot(dFdG,LHSProductRule+RHSProductRule)
+
     return dFdW

@@ -10,21 +10,21 @@ def dOmegadW(sampleY,alpha,W):
     
     #Variables needed for derivative calculation
     iterator=np.arange(N)
-    dOmegadW=np.zeros((N,N,N))    
+    derivOmegadW=np.zeros((N,N,N))    
     
-##Calculate dOmegadW     
-    for i in iterator:
-        lvector=np.array([dOmegadWEntry(sampleY,l,W,i,alpha) for l in iterator]).astype(np.float)    
-        dOmegadW[i,i,:]=lvector
+##Calculate dOmegadW    
+    for i in range(N): 
+        lvector=np.array([dOmegadWEntry(sampleY,l,W[i,:],alpha) for l in iterator]).astype(np.float)    
+        derivOmegadW[i,i,:]=lvector
             
-    return dOmegadW
+    return derivOmegadW
 
 
-def dOmegadWEntry(sampleY,l,W,i,alpha):
+def dOmegadWEntry(sampleY,l,Wvector,alpha):
 
 ## Set up parameters    
     alphaDim=len(alpha)
-    signal=np.dot(W[i,:],sampleY)
+    signal=np.dot(Wvector,sampleY)
     
     # Set sigma (standard deviation of each Gaussian) as the interval between each Gaussian center
     sigma=30.
@@ -44,11 +44,13 @@ def dOmegadWEntry(sampleY,l,W,i,alpha):
     
 
     matrixEntry=np.zeros(alphaDim)
-    iterator=np.arange(alphaDim)        
+    iteratorAlpha=np.arange(alphaDim)        
 
 ## Compute respective entry (i.e. the i,i,l) of dOmegadW 
-    matrixEntry[iterator]=np.exp(-(signal-iteratorMu[iterator])**2./(2.*sigma**2.))*(-sampleY[l]*alpha[iterator]*(signal-iteratorMu[iterator])/(sigma**2.))
+    matrixEntry[iteratorAlpha]=((-sampleY[l]*alpha[iteratorAlpha]*(signal-iteratorMu[iteratorAlpha]))/(sigma**2))*(np.exp((-(signal-iteratorMu[iteratorAlpha])**2.)/(2.*sigma**2.)))
     matrixEntry=sum(matrixEntry)
+    
+   
     return matrixEntry
 
 

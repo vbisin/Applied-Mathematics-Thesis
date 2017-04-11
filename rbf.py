@@ -2,12 +2,14 @@
 # The Gaussians' centers are equally spaced, with a sigma equal to the interval between centers  
 
 import numpy as np
-def rbfF(signal,alphaDim):
+def rbfF(W,sampleY,alphaDim):
 
-    
+    signal=np.dot(W,sampleY)
     N=len(signal)
+    iteratorN=np.arange(N)
     
-    gaussiansMatrix=np.zeros((int(N),alphaDim))
+    
+    gaussiansMatrix=np.zeros((N,alphaDim))
     
     # Set sigma to be the length between Gaussian centers
     sigma=30.
@@ -22,8 +24,6 @@ def rbfF(signal,alphaDim):
     iteratorMu[iteratorMakeMu+alphaDim/2+1]=iteratorMakeMu*30+30
     
 ## Calculate matrix of RBF Gaussians for W*y       
-    for i in range(int(N)):
-        gaussiansMatrix[i,:]=np.asarray([np.exp((-(signal[i]-(center))**2.)/(2.*sigma**2.)) for center in iteratorMu]).astype(np.float64)
-        
+    gaussiansMatrix=np.asarray([np.asarray([np.exp((-(signal[i]-center)**2.)/(2.*sigma**2.)) for center in iteratorMu]).astype(np.float64) for i in iteratorN])
             
     return gaussiansMatrix

@@ -3,9 +3,9 @@
 
 
 import numpy as np
-from gradients import alphaGradient, wGradient
+from gradients import alphaGradient, WGradient
 from estimateSignal import estimateSignal
-
+from gradientCheck import alphaGradCheck,WGradCheck
 
 
 def multiSGDthres(x,y,alpha,W): 
@@ -16,15 +16,15 @@ def multiSGDthres(x,y,alpha,W):
 ## Initializations 
 
     #Learning Rates
-    learningRateAlpha=.00005
-    learningRateW=.000005     
+    learningRateAlpha=.000005
+    learningRateW=.0000005     
     
     # Divergence criterion 
     divergenceThreshold=10
     
     
     # Error criterion needed to exit Stochastic Gradient descent 
-    threshold=.1
+    threshold=.05
     
 
 ## Graph Variables to return 
@@ -34,6 +34,7 @@ def multiSGDthres(x,y,alpha,W):
     errorEpoch.append(np.mean(np.mean((x-y)**2,axis=0)))
     
     #Historical values of alpha and W
+    global alphaHistory,WHistory
     alphaHistory=list()
     WHistory=list()
     alphaHistory.append(alpha)
@@ -48,27 +49,29 @@ def multiSGDthres(x,y,alpha,W):
     learningRates.append(learningRateAlpha)
     learningRates.append(learningRateW)
       
-
+    global alphaChange, WChange
+    alphaChange=alpha
+    WChange=W
         
 ## Stochastic Gradient Descent loop, completes at least two epochs 
     # and exits if alpha and W grads' sum is less than the threshold
     
-    while (len(errorEpoch)<3 or (abs(alphaGradEpoch[len(alphaGradEpoch)-1])+abs(WGradEpoch[len(WGradEpoch)-1]))>threshold) and len(errorEpoch)<20:
+    while (len(errorEpoch)<3 or (abs(alphaGradEpoch[len(alphaGradEpoch)-1])+abs(WGradEpoch[len(WGradEpoch)-1]))>threshold) and len(errorEpoch)<50:
     #while (len(errorEpoch)<3 or (abs(alphaGradEpoch[len(alphaGradEpoch)-1]))>threshold) and len(errorEpoch)<20:
-        
+    #while len(errorEpoch)<50:
+ 
        
-        returnMatrix=np.zeros((samples+1,5),dtype=object)
-        returnMatrix[0,:]=[alpha,W,0,0,0]  
-        returnMatrix[sample+1,:]=np.asarray([samplesSGDLoop(returnMatrix[sample,0],returnMatrix[sample,1],x[:,sample],y[:,sample],learningRateAlpha,learningRateW) for sample in samplesIterator])    
+        returnMatrix=np.zeros((samples,3),dtype=object)
+        returnMatrix=np.asarray([samplesSGDLoop(alphaChange,WChange,x[:,sample],y[:,sample],learningRateAlpha,learningRateW) for sample in samplesIterator])    
    
-        alpha=returnMatrix[samples,0]
-        W=returnMatrix[samples,1]
+        alpha=alphaChange
+        W=WChange
         # For each epoch record average error of each sample
-        errorEpoch.append(np.average(returnMatrix[:,2]))
+        errorEpoch.append(np.average(np.average(returnMatrix[:,0])))
         
         # Compute average per epoch alpha and W gradients 
-        alphaGradEpoch.append(np.average(returnMatrix[:,3]))
-        WGradEpoch.append(np.average(returnMatrix[:,4]))
+        alphaGradEpoch.append(np.average(np.average(returnMatrix[:,1])))
+        WGradEpoch.append(np.average(np.average(returnMatrix[:,2])))
         
         # Update function error between consecutive epochs 
         functionError=errorEpoch[len(errorEpoch)-1]-errorEpoch[len(errorEpoch)-2]
@@ -79,7 +82,7 @@ def multiSGDthres(x,y,alpha,W):
    ## Divergence criterion     
        # If algorithm has completed more than 2 epochs and is greater than the divergence 
        # threshold then exit 
-        if len(errorEpoch)>2 and functionError>divergenceThreshold:
+        if len(errorEpoch)>3 and functionError>divergenceThreshold:
             print("diverged")
             break
                 
@@ -90,21 +93,29 @@ def multiSGDthres(x,y,alpha,W):
     
 def samplesSGDLoop(alpha,W,sampleX,sampleY,learningRateAlpha,learningRateW):
          
-    
-    
+
     ##Calculate gradients for alpha and W
     alphaGrad=alphaGradient(sampleX,sampleY,alpha,W)
-    WGrad=wGradient(sampleX,sampleY,alpha,W)
+    WGrad=WGradient(sampleX,sampleY,alpha,W)
     
-    
+    #Check alpha and W gradients using def. of derivative 
+    alphaGradCheck(sampleX,sampleY,alpha,W)
+    checker=WGradCheck(sampleX,sampleY,alpha,W)
+    print("The difference in W grad's summed up is: "+str(sum(sum(checker))))
+   
     ## Update alpha and W                 
     alpha=alpha-learningRateAlpha*alphaGrad
     W=W-learningRateW*WGrad
     
+    global alphaChange,WChange,alphaHistory,WHistory
+    alphaChange=alpha
+    WChange=W
+    alphaHistory.append(alpha)
+    WHistory.append(W)    
     # Record MSE for each sample
     errorSample=(sampleX-estimateSignal(W,sampleY,alpha))**2
     
-    return (alpha,W,errorSample,alphaGrad,WGrad)
+    return (errorSample,alphaGrad,WGrad)
     
     
      

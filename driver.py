@@ -7,10 +7,10 @@ import matplotlib.pyplot as plt
 from rbf import rbfF
 import time
 import os
-from sgd import multiSGDthres
+from SGDvectorize import multiSGDthres
 from estimateSignal import estimateSignal
 start_time = time.time()
-
+import random
 
 
 ## Define starting parameters for algorithm 
@@ -19,24 +19,25 @@ start_time = time.time()
 maxValue=100
 
 #Number of randomly generated signals to train over
-numberExamples=500
+numberExamples=100
 
 #Length of each signal
-signalLength=100
+signalLength=20
 
 # Number of Gaussians in Gaussian RBF 
 alphaDim=11
 
 #Standard deviation of added noise 
-noiseStdDev=25
+noiseStdDev=5
 
 #Retrive randomly generated piecewise constant signals (x is original, y is noisy)
 (x,y)=createSteps(numberExamples,signalLength,maxValue,noiseStdDev)
 
 ##W and alpha Initalization 
-    
-W=np.ones((signalLength,signalLength))*.00001
-#W=np.zeros((signalLength,signalLength))
+W=np.zeros((signalLength,signalLength))   
+#for i in range(signalLength):
+#    W[i,:]=np.asarray([random.uniform(0, 1) for j in range(signalLength)]).astype(np.float)
+##
 for i in range(signalLength):
     if i==0:
         W[i,i]=1
@@ -44,14 +45,17 @@ for i in range(signalLength):
         np.fill_diagonal(W,1)
         W[i,i-1]=-1
 
-alpha=np.ones(alphaDim)*.75
+          
+alpha=np.asarray([random.uniform(0, 1) for j in range(alphaDim)]).astype(np.float)        
+#alpha=np.ones(alphaDim)*.75
+
 #Approximate optimized values of alpha after SGD (used when only optimizing W)
 #alpha=np.array([3.86,8.08,12.05,9.9,3.47,.48,-2.54,-8.667,-10.63,-6.75,-2.4], dtype=np.float)              
                   
 
 
 #Run the Stochastic Gradient Descent Algorithm
-(alpha, W, errorEpoch,errorSample,alphaHistory,WHistory,learningRates,savedAlphaGrads,savedWGrads)=multiSGDthres(x,y,alpha,W)
+(alpha, W, errorEpoch,alphaHistory,WHistory,learningRates,alphaGradEpoch,WGradEpoch)=multiSGDthres(x,y,alpha,W)
 
 
 
@@ -88,7 +92,7 @@ else:
 # Original and Noisy Signal
 plt.figure(1)
 plt.plot(iteratorN,x[:,signal],'b',label='Original signal: '+str(signal+1))
-plt.plot(iteratorN,y[:,signal],'r',label='Noisy signal (sigma=25): '+str(signal+1))
+plt.plot(iteratorN,y[:,signal],'r',label='Noisy signal (sigma='+str(noiseStdDev)+'): '+str(signal+1))
 plt.legend(bbox_to_anchor=(.55, .85), loc=0, borderaxespad=0.)
 plt.title("Sample of Original and Noisy Signals ("+str(signal+1)+" of "+ str(numberExamples)+")")
 plt.savefig('signals')
@@ -125,10 +129,9 @@ plt.show()
 estimateSum=np.zeros(EPOCH)
 WSum=np.zeros(EPOCH)
 alphaSum=np.zeros(EPOCH)
-for i in range(EPOCH):
-    estimateSum[i]=sum(np.abs(y[:,signal]+np.dot(np.transpose(WHistory[i]),np.dot(rbfF(np.dot(WHistory[i],y[:,signal]),alphaDim),alphaHistory[i])))) 
-    WSum[i]=sum(sum(np.abs(WHistory[i])))
-    alphaSum[i]=sum(np.abs(alphaHistory[i]))
+for i in iteratorEpochs:
+    estimateSum[i]=sum(np.abs(y[:,signal]+np.dot(np.transpose(WHistory[i]),np.dot(rbfF(WHistory[i],y[:,signal],alphaDim),alphaHistory[i])))) 
+alphaSum[iteratorEpochs]=np.sum(np.abs(alphaHistory[iteratorEpochs]),axis=1)
 
 # Absolute Sums of predicted and actual signals 
 plt.figure(5)
@@ -141,6 +144,8 @@ plt.xlabel('Iteration')
 plt.savefig('sumEstimate')
 plt.show
 
+
+WSum[iteratorEpochs]=np.sum(np.sum(np.abs(WHistory[iteratorEpochs]),axis=1),axis=1)
 # Absolute sums of W matrix w.r.t. epochs
 plt.figure(6)
 plt.plot(iteratorEpochs,WSum,'b',label='Sum of Absolute Value of W')
@@ -158,7 +163,6 @@ plt.plot(iteratorEpochs,alphaSum,'b',label='Sum of Absolute Value of alpha')
 plt.title("Sum of alpha")
 plt.legend(bbox_to_anchor=(.24, .89), loc=0, borderaxespad=0.)
 plt.ylabel('Sum')
-
 plt.xlabel('Iteration')
 plt.savefig('alphaSum')
 plt.show
@@ -169,12 +173,34 @@ plt.show
 plt.figure(8)
 plt.title("Original, Noisy, and Predicted Values for Signal: " +str(signal+1))
 plt.plot(iteratorN,x[:,signal],'b',label='Original Signal')
-plt.plot(iteratorN,y[:,signal],'r',label='Noisy Signal (sigma=25)')
+plt.plot(iteratorN,y[:,signal],'r',label='Noisy Signal (sigma='+str(noiseStdDev)+')')
 plt.plot(iteratorN,y[:,signal]+finalEstimates[:,signal],'k',label='Predicted Signal')
 plt.legend(bbox_to_anchor=(.52, .24), loc=0, borderaxespad=0.)
 plt.xlabel('Iteration')
 plt.savefig('estimates')
 plt.show
+
+gradIterator=np.arange(len(alphaGradEpoch))
+
+plt.figure(9)
+plt.title("Average sum of Alpha Gradient per Epoch")
+plt.plot(gradIterator,alphaGradEpoch,'b',label='Average sum of Alpha Gradient per Epoch')
+plt.legend(bbox_to_anchor=(.52, .24), loc=0, borderaxespad=0.)
+plt.xlabel('Iteration')
+plt.savefig('AlphaGradsSum')
+plt.show
+
+
+if len(WGradEpoch)>1:
+    plt.figure(10)
+    plt.title("Average sum of W Gradient per Epoch")
+    plt.plot(gradIterator,WGradEpoch,'b',label='Average sum of W Gradient per Epoch')
+    plt.legend(bbox_to_anchor=(.52, .24), loc=0, borderaxespad=0.)
+    plt.xlabel('Iteration')
+    plt.savefig('WGradsSum')
+    plt.show
+
+
 
 os.system('say "free will is an illusion"')
 print "My program took", time.time() - start_time, "to run"
