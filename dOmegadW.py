@@ -1,4 +1,4 @@
-## Returns dOmegadW derivative 
+ ## Returns dOmegadW derivative 
 # Where omega is defined as the RBF function
 
 import numpy as np

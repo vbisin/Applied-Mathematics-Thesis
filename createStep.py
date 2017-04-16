@@ -1,5 +1,7 @@
-
 ## Creates random piece-wise constant functions 
+
+# Currently optimized for signals of length 50 
+
 import numpy as np
 import random 
 
@@ -30,7 +32,7 @@ def createSteps(samples,length,maxValue,noiseStd):
 def speedCreateSteps(length,maxValue):
 
  # For each signal randomly decide how many "steps" or changes in values there will be 
-    numberSteps=random.sample(set([1, 2, 4, 5,10,20,25,50]), 1)[0]
+    numberSteps=random.sample(set([1, 2, 4, 5,10,20,25]), 1)[0]
     
     # Depending on the number of steps, we define a uniform "step" length for each signal
     intervalLength=length/numberSteps
@@ -44,7 +46,7 @@ def speedCreateSteps(length,maxValue):
     for j in range(numberSteps):
         start=j*intervalLength
         end=(j+1)*intervalLength
-        vectorX[start:end]=random.uniform(0,maxValue)
+        vectorX[start:end]=int(random.uniform(0,maxValue))
 
 
 

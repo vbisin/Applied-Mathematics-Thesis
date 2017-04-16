@@ -1,6 +1,4 @@
-
 ## Stochastic Gradient Descent Loop for Algorithm 
-
 
 import numpy as np
 from gradients import alphaGradient, WGradient
@@ -17,14 +15,14 @@ def multiSGDthres(x,y,alpha,W):
 
     #Learning Rates
     learningRateAlpha=.000005
-    learningRateW=.0000005     
+    learningRateW=.000005     
     
     # Divergence criterion 
     divergenceThreshold=10
     
     
     # Error criterion needed to exit Stochastic Gradient descent 
-    threshold=.05
+    threshold=.0005
     
 
 ## Graph Variables to return 
@@ -56,14 +54,14 @@ def multiSGDthres(x,y,alpha,W):
 ## Stochastic Gradient Descent loop, completes at least two epochs 
     # and exits if alpha and W grads' sum is less than the threshold
     
-    while (len(errorEpoch)<3 or (abs(alphaGradEpoch[len(alphaGradEpoch)-1])+abs(WGradEpoch[len(WGradEpoch)-1]))>threshold) and len(errorEpoch)<50:
-    #while (len(errorEpoch)<3 or (abs(alphaGradEpoch[len(alphaGradEpoch)-1]))>threshold) and len(errorEpoch)<20:
-    #while len(errorEpoch)<50:
+    while (len(errorEpoch)<3 or (abs(alphaGradEpoch[len(alphaGradEpoch)-1])+abs(WGradEpoch[len(WGradEpoch)-1]))>threshold) and len(errorEpoch)<30:
  
-       
+        # Matrix to be returned after each iteration of the SGD algorithm
+        # Returns the MSE error per sample, alpha gradient, and W gradient 
         returnMatrix=np.zeros((samples,3),dtype=object)
         returnMatrix=np.asarray([samplesSGDLoop(alphaChange,WChange,x[:,sample],y[:,sample],learningRateAlpha,learningRateW) for sample in samplesIterator])    
    
+    
         alpha=alphaChange
         W=WChange
         # For each epoch record average error of each sample
@@ -99,9 +97,10 @@ def samplesSGDLoop(alpha,W,sampleX,sampleY,learningRateAlpha,learningRateW):
     WGrad=WGradient(sampleX,sampleY,alpha,W)
     
     #Check alpha and W gradients using def. of derivative 
-    alphaGradCheck(sampleX,sampleY,alpha,W)
-    checker=WGradCheck(sampleX,sampleY,alpha,W)
-    print("The difference in W grad's summed up is: "+str(sum(sum(checker))))
+    
+    #alphaGradCheck(sampleX,sampleY,alpha,W)
+    #checker=WGradCheck(sampleX,sampleY,alpha,W)
+    #print("The difference in W grad's summed up is: "+str(sum(sum(checker))))
    
     ## Update alpha and W                 
     alpha=alpha-learningRateAlpha*alphaGrad

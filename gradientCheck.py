@@ -4,19 +4,19 @@ import numpy as np
 from estimateSignal import estimateSignal
 from gradients import alphaGradient, WGradient
 import copy
-#import random
 
 def alphaGradCheck(sampleX,sampleY,alpha,W):
     
     alphaDim=len(alpha)
     alphaIterator=np.arange(alphaDim)
-    # choose vector entry
     alphaSum=0
+    
     for i in alphaIterator:
         
+        # My calculated derivative estimate
         alphaGrad=alphaGradient(sampleX,sampleY,alpha,W)[i]
         
-        
+        # Estimate derivative using definition of derivative 
         epsilon=.0001
         alphaEpsPos=copy.deepcopy(alpha)
         alphaEpsPos[i]=alphaEpsPos[i]+epsilon
@@ -34,21 +34,29 @@ def alphaGradCheck(sampleX,sampleY,alpha,W):
             print("Alpha grad's "+str(i+1)+"th entry is incorrect. The difference between the two is: " + str(abs(alphaGrad-derivativeCheck)))
             bools=False
         
+        # Calculate alpha sum just to check that alpha gradient is non-constant 
         alphaSum=abs(alphaGrad)+alphaSum
             
     if bools==True:
-            print("Alpha gradient is correct (and sum over alphas is: " + str(alphaSum)+")")
-                   
+           # print("Alpha gradient is correct (and sum over alphas is: " + str(alphaSum)+")")
+            print("Alpha gradient is correct")
+     
              
 def WGradCheck(sampleX,sampleY,alpha,W):
         
     WIterator=np.arange(len(sampleX))
-    checkableW=np.zeros((len(sampleX),len(sampleX)))
-# choose matrix entry
-    checkableW=np.asarray([np.asarray([speedWGradCheck(i,j,sampleX,sampleY,alpha,W) for j in WIterator]).astype(np.float) for i in WIterator])
-    gradDifference=checkableW-WGradient(sampleX,sampleY,alpha,W)
+    correctGrads=np.zeros((len(sampleX),len(sampleX)))
+
+    # For each matrix entry, calculate estimated derivative using definition of gradient 
+    correctGrads=np.asarray([np.asarray([speedWGradCheck(i,j,sampleX,sampleY,alpha,W) for j in WIterator]).astype(np.float) for i in WIterator])
     
-    if (abs(gradDifference)<.01).all():
+    # My calculated derivatives 
+    myGrads=WGradient(sampleX,sampleY,alpha,W)
+    
+    # Calculate matrix of differences 
+    gradDifference=correctGrads-myGrads
+    
+    if (abs(gradDifference)<.5).all():
         print("W Gradient is correct")
         return gradDifference
     else:    
@@ -58,11 +66,13 @@ def WGradCheck(sampleX,sampleY,alpha,W):
 ## Sub function to speed up WGradCheck
 def speedWGradCheck(i,j,sampleX,sampleY,alpha,W):    
     
+    
+    # Calculate estimated derivative for each entry of W
     epsilon=.0001
     WEpsPos=copy.deepcopy(W)
     WEpsPos[i][j]=WEpsPos[i][j]+epsilon
     WEpsNeg=copy.deepcopy(W)
-    WEpsNeg[i][j]=WEpsPos[i][j]-epsilon
+    WEpsNeg[i][j]=WEpsNeg[i][j]-epsilon
     
     
     

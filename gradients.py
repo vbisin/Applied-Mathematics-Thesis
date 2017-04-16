@@ -63,20 +63,17 @@ def WGradient(sampleX,sampleY,alpha,W):
 
 ## Calculate LHS of product rule for dGammadW (i.e. -transpose(W)*dOmegadW)
     derivOmegadW=dOmegadW(sampleY,alpha,W)
-    LHSProductRule=np.dot(negTransW,derivOmegadW)
+    LHSProductRule=np.dot(derivOmegadW,negTransW)
 
-    
 ## Calculate RHS of product rule for dGammadW (i.e. d(-transpose(W))dW*omega) 
     #since d(-transpose(W))dW is the identity 4-tensor, then the above product will be a 3 tensor
     RHSProductRule=np.zeros((N,N,N))
     iterator=np.arange(N)
-    #LHSProductRule[iterator,iterator,iterator]=-omega[iterator]
-    RHSProductRule[iterator,iterator,iterator]=-omega[iterator]
+    RHSProductRule[iterator,iterator,:]=-omega[iterator]
 
 
 ## Calculate dFdW (i.e. dFdG*dGammadW)
     dFdG=dFdGamma(sampleX,sampleY,alpha,W)
-
-    dFdW=np.dot(dFdG,LHSProductRule+RHSProductRule)
+    dFdW=np.dot(np.transpose(LHSProductRule+RHSProductRule),dFdG)
 
     return dFdW

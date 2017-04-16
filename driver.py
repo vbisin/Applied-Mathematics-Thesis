@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from rbf import rbfF
 import time
 import os
-from SGDvectorize import multiSGDthres
+from SGDvectorized import multiSGDthres
 from estimateSignal import estimateSignal
 start_time = time.time()
 import random
@@ -19,10 +19,10 @@ import random
 maxValue=100
 
 #Number of randomly generated signals to train over
-numberExamples=100
+numberExamples=10000
 
 #Length of each signal
-signalLength=20
+signalLength=50
 
 # Number of Gaussians in Gaussian RBF 
 alphaDim=11
@@ -34,24 +34,26 @@ noiseStdDev=5
 (x,y)=createSteps(numberExamples,signalLength,maxValue,noiseStdDev)
 
 ##W and alpha Initalization 
-W=np.zeros((signalLength,signalLength))   
-#for i in range(signalLength):
-#    W[i,:]=np.asarray([random.uniform(0, 1) for j in range(signalLength)]).astype(np.float)
-##
+W=np.zeros((signalLength,signalLength))
+
+# Random initialization   
 for i in range(signalLength):
-    if i==0:
-        W[i,i]=1
-    else:
-        np.fill_diagonal(W,1)
-        W[i,i-1]=-1
+    W[i,:]=np.asarray([random.uniform(0, 10) for j in range(signalLength)]).astype(np.float)
+    
+# Finite difference operator    
 
-          
-alpha=np.asarray([random.uniform(0, 1) for j in range(alphaDim)]).astype(np.float)        
+#for i in range(signalLength):
+#    if i==0:
+#        W[i,i]=1
+#    else:
+#        np.fill_diagonal(W,1)
+#        W[i,i-1]=-1
+
+# Random initialization          
+alpha=np.asarray([random.uniform(0, 10) for j in range(alphaDim)]).astype(np.float)        
+
+# Constant initialization 
 #alpha=np.ones(alphaDim)*.75
-
-#Approximate optimized values of alpha after SGD (used when only optimizing W)
-#alpha=np.array([3.86,8.08,12.05,9.9,3.47,.48,-2.54,-8.667,-10.63,-6.75,-2.4], dtype=np.float)              
-                  
 
 
 #Run the Stochastic Gradient Descent Algorithm
@@ -199,6 +201,16 @@ if len(WGradEpoch)>1:
     plt.xlabel('Iteration')
     plt.savefig('WGradsSum')
     plt.show
+
+
+plt.figure(11)
+plt.title("Influence Function")
+plt.plot(len(y[:,signal]),np.dot(rbfF(W,y[:,signal],len(alpha)),alpha),'b',label='Influence Function for Signal '+str(signal))
+plt.legend(bbox_to_anchor=(.52, .24), loc=0, borderaxespad=0.)
+plt.xlabel('Iteration')
+plt.savefig('influenceFunction')
+plt.show
+
 
 
 
