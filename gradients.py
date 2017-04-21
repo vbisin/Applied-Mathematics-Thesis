@@ -1,10 +1,10 @@
 ## Solves for gradients of loss function - w.r.t alpha and W
 
-
 import numpy as np
 from rbf import rbfF
 from dOmegadW import dOmegadW
 from estimateSignal import estimateSignal
+import scipy 
 
 
 ## Computes the dFdGamma derivative used in both the alpha and W gradients
@@ -35,45 +35,35 @@ def alphaGradient(sampleX,sampleY,alpha,W):
 ## Calculate dGammaddAlpha 
     dGdA=np.asarray([np.asarray([np.dot(negWTrans[i,:],(rbfWY[:,j])) for j in iteratorAlpha]).astype(np.float) for i in iteratorN])
     
-    
 ## Calculate dot product from chain rule (dFdGamma=dFdGamma*dGammadAlpha) 
-    dFdG=dFdGamma(sampleX,sampleY,alpha,W)
-    
+    dFdG=dFdGamma(sampleX,sampleY,alpha,W)  
     dFdA=np.dot(dFdG,dGdA) 
     
     return dFdA
 
 
-
-
-
-
 ## Compute the derivative w.r.t. W
-def WGradient(sampleX,sampleY,alpha,W):
+def WGradient(sampleX,sampleY,alpha,W,negWTransDeriv):
     
     # Recover respective lengths
-    N=len(sampleX)
     alphaDim=len(alpha)
     negTransW=-np.transpose(W)
     
+## Calculate LHS of product rule for dGammadW (i.e. -transpose(W)*dOmegadW)
+    derivOmegadW=dOmegadW(sampleY,alpha,W)
+    LHSProductRule=scipy.tensordot(negTransW,derivOmegadW, axes=[1,0])
+ 
+## Calculate RHS of product rule for dGammadW (i.e. d(-transpose(W))dW*omega) 
+    #since d(-transpose(W))dW is a 4-tensor, then the above product will be a 3 tensor
     
     # Define omega as the Gaussian RBF Function
     rbfWY=rbfF(W,sampleY,alphaDim)
     omega=np.dot(rbfWY,alpha)
-
-## Calculate LHS of product rule for dGammadW (i.e. -transpose(W)*dOmegadW)
-    derivOmegadW=dOmegadW(sampleY,alpha,W)
-    LHSProductRule=np.dot(derivOmegadW,negTransW)
-
-## Calculate RHS of product rule for dGammadW (i.e. d(-transpose(W))dW*omega) 
-    #since d(-transpose(W))dW is the identity 4-tensor, then the above product will be a 3 tensor
-    RHSProductRule=np.zeros((N,N,N))
-    iterator=np.arange(N)
-    RHSProductRule[iterator,iterator,:]=-omega[iterator]
-
+ 
+    RHSProductRule=scipy.tensordot(negWTransDeriv,omega, axes=[1,0])
 
 ## Calculate dFdW (i.e. dFdG*dGammadW)
     dFdG=dFdGamma(sampleX,sampleY,alpha,W)
-    dFdW=np.dot(np.transpose(LHSProductRule+RHSProductRule),dFdG)
-
+    dFdW=scipy.tensordot(dFdG,LHSProductRule+RHSProductRule, axes=[0,0])
+        
     return dFdW

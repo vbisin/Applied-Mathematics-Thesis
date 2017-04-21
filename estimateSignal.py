@@ -1,5 +1,4 @@
 ## Evaluates RHS of loss function (i.e. returns the predicting signal)
-
 import numpy as np
 from rbf import rbfF
 

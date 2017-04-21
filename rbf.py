@@ -7,23 +7,49 @@ def rbfF(W,sampleY,alphaDim):
     signal=np.dot(W,sampleY)
     N=len(signal)
     iteratorN=np.arange(N)
-    
-    
     gaussiansMatrix=np.zeros((N,alphaDim))
     
-    # Set sigma to be the length between Gaussian centers
-    sigma=30.
-    
-    # First define iterator array with values in the negative image range of the signal 
-    iteratorMu=np.zeros(alphaDim)
-    iteratorMakeMu=np.arange(alphaDim/2)
-    iteratorMakeMuRev=iteratorMakeMu[::-1]*(-30)-30
+    # Compute step size and iterator for RBF 
+    (stepSize,iteratorMu)=GRBFCenters(np.dot(W,sampleY),alphaDim)
 
-    # Define iterator array with values in the positive image range of the signal 
-    iteratorMu[iteratorMakeMu]=iteratorMakeMuRev[iteratorMakeMu]
-    iteratorMu[iteratorMakeMu+alphaDim/2+1]=iteratorMakeMu*30+30
     
+    # Set sigma to be the length between Gaussian centers
+    sigma=float(stepSize)
+              
 ## Calculate matrix of RBF Gaussians for W*y       
     gaussiansMatrix=np.asarray([np.asarray([np.exp((-(signal[i]-center)**2.)/(2.*sigma**2.)) for center in iteratorMu]).astype(np.float64) for i in iteratorN])
             
     return gaussiansMatrix
+
+
+def GRBFCenters(signal,alphaDim):
+    # Define min and max of the input signal
+    minSig=min(signal)
+    maxSig=max(signal)
+    
+    # Calculate total length of the interval between the max and min  
+    if maxSig<0 and minSig>0:
+        print("code needs to be fixed here")
+    interval=abs(int(maxSig)-int(minSig))
+    
+    # Keep increasing interval until it is divisible by the dimension of alpha
+    freedom=False
+    while freedom==False:
+        if interval%(alphaDim-1)!=0:
+            interval=interval+1
+        else:
+            break
+    
+    # Calculate step size so that given current dimension of alpha, we can span the entire interval
+    stepSize=interval/float(alphaDim-1)
+    
+    # Make array with corresponding step size so that spans entire interval
+    iteratorMakeMu=np.arange(alphaDim)*stepSize
+    
+    # Define an array using step size so that it covers the entire interval                         
+    iteratorAlpha=np.arange(alphaDim)
+    iteratorMu=np.zeros(alphaDim)
+    minSig=int(min(signal))
+    iteratorMu[iteratorAlpha]=iteratorMakeMu[iteratorAlpha]+minSig   
+        
+    return (stepSize, iteratorMu)

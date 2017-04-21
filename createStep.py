@@ -1,7 +1,4 @@
 ## Creates random piece-wise constant functions 
-
-# Currently optimized for signals of length 50 
-
 import numpy as np
 import random 
 
@@ -18,21 +15,29 @@ def createSteps(samples,length,maxValue,noiseStd):
     iteratorSamples=np.arange(samples)
     iteratorLength=np.arange(length)    
     
+# Determine multiples of lenth of signal, to then define number of uniform "steps" of each step function
+    multiples=list()
+    iteratorMultiples=np.arange(length)+1
+    
+    for i in iteratorMultiples:
+        if length%i==0:
+            multiples.append(i)
+    
+    
 ## Function calling loop which defines each signal   
     
-    x=np.transpose(np.asarray([speedCreateSteps(length,maxValue) for i in iteratorSamples]).astype(np.float))
+    x=np.transpose(np.asarray([speedCreateSteps(length,maxValue,multiples) for i in iteratorSamples]).astype(np.float))
        
     
    ## For each point in the original x signal, we add random Gaussian noise (0,noiseStd) to define y
     y[iteratorLength,:]= np.transpose([np.asarray([x[i,j]+np.random.normal(0,noiseStd) for i in iteratorLength]).astype(np.float) for j in iteratorSamples])
 
-    
     return (x,y)   
 
-def speedCreateSteps(length,maxValue):
+def speedCreateSteps(length,maxValue,multiples):
 
- # For each signal randomly decide how many "steps" or changes in values there will be 
-    numberSteps=random.sample(set([1, 2, 4, 5,10,20,25]), 1)[0]
+ # For each signal randomly pick one of the above defined multiples, this will be the number of "steps" or changes in values there will be 
+    numberSteps=random.sample(multiples,1)[0]
     
     # Depending on the number of steps, we define a uniform "step" length for each signal
     intervalLength=length/numberSteps
