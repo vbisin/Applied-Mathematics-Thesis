@@ -10,14 +10,14 @@ The driver script for the algorithm. Outputs graphs and percent successfully den
 2. speedCreateSteps - Creates step function (without noise) for each sample
 ## sgd.py
 1. multiSGDthres - Runs stochastic gradient descent to minimize the the kernel (W) and radial basis function parameter (alpha). 
-2. samplesSGDLoop - Computes alpha, W gradients, and error per sample 
+2. SGDSample - Updates alpha and W values after computing gradient for one sample.
 
 ## rbf.py
 1. rbfF - Calculates the Gaussian functions in the Gaussian Radial Basis Function (before being multiplied by the minimized parameter, alpha).
-2. GRBFCenters- Optimizes the equally spaced centers of the Gaussian RBF's given the input signal's range.  
+2. GRBFCenters- Optimizes the equally spaced centers of the Gaussian RBF's, given the input signal's range.  
 
 ## estimateSignal.py
-Estimates values of predicted signal given current parameters.
+Computes predicted signal given current parameters.
 
 ## gradients.py
 1. dFdGamma - calculates gradient of loss function w.r.t. variables inside the norm (needed for chain rule).

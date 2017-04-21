@@ -9,8 +9,6 @@ from estimateSignal import estimateSignal
 def multiSGDthres(x,y,alpha,W,learningRateAlpha,learningRateW,negWTransDeriv): 
     
 ##Recover variable dimensions
-    global N
-    N=len(x[:,0])
     samples=x.shape[1]
     samplesIterator=np.arange(samples)
 ## Initializations 
@@ -56,7 +54,7 @@ def multiSGDthres(x,y,alpha,W,learningRateAlpha,learningRateW,negWTransDeriv):
         # Matrix to be returned after each iteration of the SGD algorithm
         # Returns the MSE error per sample, alpha gradient, and W gradient 
         returnMatrix=np.zeros((samples,3),dtype=object)
-        returnMatrix=np.asarray([samplesSGDLoop(alphaChange,WChange,x[:,sample],y[:,sample],learningRateAlpha,learningRateW,negWTransDeriv) for sample in samplesIterator])    
+        returnMatrix=np.asarray([SGDSample(alphaChange,WChange,x[:,sample],y[:,sample],learningRateAlpha,learningRateW,negWTransDeriv) for sample in samplesIterator])    
    
     
         alpha=alphaChange
@@ -72,12 +70,12 @@ def multiSGDthres(x,y,alpha,W,learningRateAlpha,learningRateW,negWTransDeriv):
         # Update function error between consecutive epochs 
         functionError=errorEpoch[len(errorEpoch)-2]-errorEpoch[len(errorEpoch)-1]
         
-        print("Threshold SGD " + str(len(errorEpoch)-1))
+        print("Threshold SGD iteration: " + str(len(errorEpoch)-1))
         
         
    ## Divergence criterion     
-       # If algorithm has completed more than 2 epochs and is greater than the divergence 
-       # threshold then exit 
+       # If the algorithm has completed more than 2 epochs and its objective function error has increased
+       # more than the divergence threshold, then exist
         if len(errorEpoch)>3 and functionError<divergenceThreshold:
             print("diverged")
             break
@@ -86,7 +84,7 @@ def multiSGDthres(x,y,alpha,W,learningRateAlpha,learningRateW,negWTransDeriv):
     return (alpha, W, errorEpoch,np.array(alphaHistory),np.array(WHistory),learningRates,alphaGradEpoch,WGradEpoch)            
     
     
-def samplesSGDLoop(alpha,W,sampleX,sampleY,learningRateAlpha,learningRateW,negWTransDeriv):
+def SGDSample(alpha,W,sampleX,sampleY,learningRateAlpha,learningRateW,negWTransDeriv):
          
     ##Calculate gradients for alpha and W
     alphaGrad=alphaGradient(sampleX,sampleY,alpha,W)
