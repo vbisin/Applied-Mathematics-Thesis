@@ -28,4 +28,9 @@ Computes predicted signal given current parameters.
 1. dOmegadW - Returns derivative of omega (defined as the Gaussian RBF) w.r.t the kernel (W).
 2. dOmegadWEntry - returns an entry of the above 3-tensor, dOmegadW.
 
+## Armijo.py
+1. armijoAlpha - Estimates the optimal step size for the alpha gradient using the Armijo Rule. 
+2. armijoW - Estimates the optimal step size for the W gradient using the Armijo Rule. 
+
+ 
 

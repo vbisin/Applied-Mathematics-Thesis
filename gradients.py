@@ -17,7 +17,7 @@ def dFdGamma(sampleX,sampleY,alpha,W):
 
 
 ## Compute the gradient w.r.t. alpha
-def alphaGradient(sampleX,sampleY,alpha,W):
+def alphaGradient(alpha,sampleX,sampleY,W):
     
     # Recover respective lengths
     N=len(sampleX)    
@@ -43,7 +43,7 @@ def alphaGradient(sampleX,sampleY,alpha,W):
 
 
 ## Compute the derivative w.r.t. W
-def WGradient(sampleX,sampleY,alpha,W,negWTransDeriv):
+def WGradient(W,sampleX,sampleY,alpha,negWTransDeriv):
     
     # Recover respective lengths
     alphaDim=len(alpha)
