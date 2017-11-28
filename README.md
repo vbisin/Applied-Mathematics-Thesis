@@ -1,7 +1,7 @@
 # Learning Optimal Filter and Penalty Function for Denoising
 
 ## driver.py
-The driver script for the algorithm. Outputs graphs and percent successfully denoised for train and test sets. 
+The driver script for the algorithm. Outputs graphs and percent successfully denoised for learned model on train and test sets. 
 
 ##  createStep.py 
 1. createSteps- Creates step (i.e. piece-wise constant) signals, where each function has a number of jumps equal to a multiple of the original signal's length. Gaussian noise is then added to each signal. 
