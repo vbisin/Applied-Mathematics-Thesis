@@ -1,4 +1,4 @@
-# Learning Optimal Filter and Penalty Function for Denoising
+# A Study in Total Variation Denoising and its Validity in a Recently Proposed Denoising Algorithm
 
 ## driver.py
 The driver script for the algorithm. Outputs graphs and percent successfully denoised for learned model on train and test sets. 
